@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anushka Agnihotri — Communication Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Playpen+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F5F1E8; --blue: #7F98B7; --yellow: #FFE100;
+      --dark: #1a1a1a; --mid: #555; --light-bg: #EDE9DF;
+      --fg: #F5C842; --fu: #A8B8D8; --fe: #9BBF8A;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: 'Patrick Hand', cursive; cursor: none; overflow-x: hidden; }
+
+    /* CURSOR */
+    #cursor { width:20px;height:20px;border-radius:50%;background:var(--blue);position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;mix-blend-mode:multiply; }
+    #cursor.hovered { width:36px;height:36px;opacity:.7; }
+
+    /* NAV */
+    nav { position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 60px;background:var(--bg);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s; }
+    nav.scrolled { border-color:rgba(127,152,183,.2);box-shadow:0 2px 20px rgba(0,0,0,.04); }
+    .nav-logo { width:44px;height:44px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-family:'Patrick Hand',cursive;text-decoration:none;flex-shrink:0; }
+    .nav-links { display:flex;gap:40px;list-style:none; }
+    .nav-links a { text-decoration:none;color:var(--dark);font-size:16px;font-family:'Patrick Hand',cursive;transition:color .2s; }
+    .nav-links a:hover { color:var(--blue); }
+    .nav-links .resume-link { color:var(--blue); }
+
+    /* HERO */
+    #hero { min-height:90vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 60px 60px;gap:40px; }
+    .hero-text { max-width:560px; }
+    .hero-label { font-size:12px;letter-spacing:2.5px;color:var(--blue);text-transform:uppercase;margin-bottom:28px; }
+    .hero-heading { font-size:clamp(36px,4.5vw,58px);line-height:1.15;margin-bottom:28px; }
+    .hero-heading .blue-line { color:var(--blue);display:block; }
+    .hero-para { font-size:17px;line-height:1.7;color:var(--mid);max-width:440px; }
+    .hero-para mark { background:var(--yellow);color:var(--dark);padding:0 2px;border-radius:2px; }
+    .hero-visual { width:100%;height:90vh;overflow:hidden; }
+    .hero-visual img { width:100%;height:100%;object-fit:contain;object-position:center bottom; }
+    /* fallback hero illustration */
+    .hero-fallback { width:100%;height:90vh;display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px; }
+    .hero-fallback svg { max-height:88%;width:auto; }
+
+    /* DRAW */
+    #draw-section { position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;background:var(--light-bg); }
+    .draw-bg { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;pointer-events:none; }
+    .draw-bg-fallback { position:absolute;inset:0;background-image:radial-gradient(circle,rgba(127,152,183,.12) 1px,transparent 1px);background-size:40px 40px;pointer-events:none; }
+    .draw-content { position:relative;z-index:2;text-align:center; }
+    .draw-content h2 { font-size:clamp(24px,3.5vw,40px);line-height:1.3;margin-bottom:10px; }
+    .draw-sub { color:var(--blue);font-size:17px;margin-bottom:36px; }
+    .canvas-wrapper { position:relative;display:inline-block; }
+    .canvas-stamp { background:var(--blue);padding:14px;position:relative;outline:10px dashed var(--light-bg);outline-offset:-4px;border-radius:4px; }
+    #drawCanvas { display:block;background:var(--blue);cursor:crosshair;width:380px;height:340px; }
+    .draw-placeholder { position:absolute;inset:14px;display:flex;align-items:center;justify-content:center;pointer-events:none;color:rgba(255,255,255,.6);font-size:18px;font-family:'Patrick Hand',cursive;letter-spacing:1px; }
+    .draw-buttons { display:flex;gap:14px;margin-top:24px;justify-content:center; }
+    .draw-buttons button { font-family:'Patrick Hand',cursive;font-size:16px;padding:10px 24px;border-radius:6px;border:2px solid var(--dark);background:var(--bg);color:var(--dark);cursor:none;transition:background .2s,color .2s,transform .15s; }
+    .draw-buttons button:hover { background:var(--dark);color:var(--bg);transform:translateY(-2px); }
+    .draw-buttons .btn-next { background:var(--blue);color:#fff;border-color:var(--blue); }
+    .draw-buttons .btn-next:hover { background:#6080a0;border-color:#6080a0; }
+
+    /* USER GRID */
+    #user-grid { padding:80px 60px;background:var(--light-bg); }
+    .user-grid-intro { text-align:center;max-width:700px;margin:0 auto 50px;font-size:clamp(15px,1.6vw,19px);line-height:1.7;color:var(--mid); }
+    .faces-grid-art { width:100%;max-width:1100px;margin:0 auto;position:relative; }
+    .faces-grid-art img { width:100%;height:auto;display:block;border-radius:8px; }
+    .faces-grid-fallback { display:grid;grid-template-columns:repeat(6,1fr);gap:8px;background:#e8e4da;border-radius:8px;padding:20px; }
+    .face-cell { aspect-ratio:1;background:#d8d4ca;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:28px; }
+    .user-drawing-overlay { position:absolute;bottom:16px;right:16px;width:160px;height:160px;border-radius:6px;border:3px solid var(--blue);background:var(--light-bg);overflow:hidden;display:none; }
+    .user-drawing-overlay img { width:100%;height:100%;object-fit:contain; }
+
+    /* CREATIVE PROCESS P1 */
+    #creative-process { padding:80px 60px;background:var(--bg); }
+    .cp-title { font-size:clamp(22px,2.5vw,34px);letter-spacing:1px;text-transform:uppercase;text-decoration:underline;text-underline-offset:6px;margin-bottom:40px; }
+    .cp-road-art { width:100%;max-width:1100px;margin:0 auto; }
+    .cp-road-art img { width:100%;height:auto;display:block; }
+    .cp-road-fallback { background:var(--light-bg);border-radius:16px;padding:60px 40px 100px;position:relative;overflow:hidden; }
+    .cp-ribbon { position:absolute;bottom:-40px;left:-5%;right:-5%;height:130px;background:var(--yellow);border-radius:80px 80px 0 0;transform:rotate(-2deg); }
+    .cp-steps { display:flex;justify-content:space-around;position:relative;z-index:2; }
+    .cp-step { text-align:center; }
+    .cp-step-word { font-size:clamp(28px,3vw,46px);display:block;margin-bottom:8px; }
+    .cp-step-heart { font-size:22px; }
+    .cp-step:last-child .cp-step-word { color:var(--blue); }
+    .cp-road-desc { margin-top:40px;max-width:620px;font-size:clamp(16px,1.6vw,20px);line-height:1.7;color:var(--mid); }
+    .cp-road-desc .hl-blue { color:var(--blue); }
+
+    /* CREATIVE PROCESS P2 */
+    #context-section { padding:80px 60px;background:var(--light-bg); }
+    .context-art { width:100%;max-width:1100px;margin:0 auto; }
+    .context-art img { width:100%;height:auto;display:block;border-radius:8px; }
+    .context-fallback { display:grid;grid-template-columns:1fr auto 1fr;gap:40px;align-items:center;max-width:1100px;margin:0 auto; }
+    .ctx-sketch { background:#fff;border-radius:12px;padding:24px;min-height:260px;box-shadow:0 2px 16px rgba(0,0,0,.06); }
+    .ctx-tag { font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:12px;display:block; }
+    .stickies { display:flex;flex-wrap:wrap;gap:8px;margin-top:12px; }
+    .sticky-n { background:var(--yellow);width:44px;height:44px;border-radius:2px;box-shadow:2px 2px 4px rgba(0,0,0,.1); }
+    .wlines .wl { height:8px;background:#e0e0e0;border-radius:4px;margin-bottom:8px; }
+    .ctx-center { text-align:center;min-width:240px;max-width:360px; }
+    .ctx-center .ctx-heading { font-size:clamp(22px,2.8vw,34px);line-height:1.4;margin-bottom:20px; }
+    .ctx-center .hl { background:var(--yellow);padding:0 4px;border-radius:3px; }
+    .ctx-center .ctx-body { font-size:15px;color:var(--mid);line-height:1.8;text-align:left; }
+    .ctx-center .ctx-body .hli { background:var(--yellow);padding:0 2px; }
+
+    /* PROJECTS */
+    #projects { padding:80px 60px;background:var(--bg); }
+    .projects-header { margin-bottom:16px; }
+    .projects-header h2 { font-size:clamp(40px,6vw,80px);line-height:1;letter-spacing:-1px; }
+    .underline-bar { height:5px;background:var(--yellow);width:340px;margin-top:6px; }
+    .projects-subtitle { font-size:17px;color:var(--mid);margin-top:12px;margin-bottom:60px; }
+    .folders-row { display:grid;grid-template-columns:repeat(3,1fr);gap:40px;align-items:end; }
+    .folder { position:relative;cursor:none; }
+    .folder-body { border-radius:0 12px 12px 12px;padding:50px 24px 30px;min-height:240px;display:flex;align-items:flex-end;transition:transform .2s;cursor:pointer; }
+    .folder-body:hover { transform:translateY(-4px); }
+    .folder-graphics .folder-body { background:var(--fg); }
+    .folder-ux .folder-body { background:var(--fu); }
+    .folder-extra .folder-body { background:var(--fe); }
+    .folder-tab { position:absolute;top:-38px;left:0;padding:8px 28px;border-radius:8px 8px 0 0;font-size:15px; }
+    .folder-graphics .folder-tab { background:var(--fg); }
+    .folder-ux .folder-tab { background:var(--fu); }
+    .folder-extra .folder-tab { background:var(--fe); }
+    .folder-label { background:rgba(255,255,255,.65);border-radius:6px;padding:18px 20px;font-size:18px;width:100%;text-align:center;letter-spacing:.5px; }
+    .project-cards-container { display:none;padding:24px 0 0;flex-direction:column;gap:14px; }
+    .project-cards-container.open { display:flex; }
+    .project-card { background:#fff;border-radius:8px;padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-decoration:none;color:var(--dark);cursor:none;transition:transform .2s,box-shadow .2s;display:block; }
+    .project-card:hover { transform:translateY(-3px) scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.12); }
+    .project-card h4 { font-family:'Patrick Hand',cursive;font-size:15px;margin-bottom:5px; }
+    .project-card p { font-family:'Playpen Sans',cursive;font-size:12px;color:var(--mid);line-height:1.5; }
+    .folder-click-hint { text-align:center;font-size:13px;color:rgba(0,0,0,.4);margin-top:8px; }
+
+    /* CONTACT */
+    #contact { padding:80px 60px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;background:var(--bg); }
+    .contact-visual img { width:100%;max-width:520px;height:auto;display:block; }
+    .contact-visual-fallback { max-width:520px;background:var(--light-bg);border-radius:20px;padding:60px 40px;text-align:center; }
+    .contact-bird-art { font-size:80px;display:block;margin-bottom:12px; }
+    .contact-sign { display:inline-block;border:3px solid var(--dark);border-radius:8px;padding:12px 28px;font-size:22px;font-family:'Patrick Hand',cursive;background:#fff;box-shadow:4px 4px 0 var(--dark); }
+    .contact-text h3 { font-size:clamp(18px,2vw,26px);color:var(--mid);margin-bottom:8px; }
+    .contact-text h2 { font-size:clamp(36px,5vw,64px);color:var(--blue);line-height:1;margin-bottom:36px; }
+    .contact-btns { display:flex;gap:16px;margin-bottom:40px; }
+    .contact-btn { display:inline-flex;align-items:center;gap:6px;padding:12px 28px;background:var(--blue);color:#fff;text-decoration:none;border-radius:6px;font-family:'Patrick Hand',cursive;font-size:16px;cursor:none;transition:background .2s,transform .15s; }
+    .contact-btn:hover { background:#6080a0;transform:translateY(-2px); }
+    .contact-info p { font-size:15px;color:var(--blue);margin-bottom:6px; }
+    .contact-info a { color:inherit;text-decoration:none; }
+    .contact-info a:hover { text-decoration:underline; }
+
+    /* REVEAL */
+    .reveal { opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease; }
+    .reveal.visible { opacity:1;transform:translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width:900px) {
+      nav { padding:16px 28px; } .nav-links { gap:20px; }
+      #hero { grid-template-columns:1fr;padding:40px 28px;min-height:auto; }
+      .hero-visual,.hero-fallback { height:50vw;min-height:280px; }
+      #draw-section { padding:50px 16px; } #drawCanvas { width:300px;height:280px; }
+      #user-grid,#creative-process,#context-section,#projects,#contact { padding:60px 28px; }
+      .folders-row { grid-template-columns:1fr;gap:60px; }
+      #contact { grid-template-columns:1fr;gap:40px; }
+      .context-fallback { grid-template-columns:1fr; }
+      .cp-steps { flex-direction:column;align-items:center;gap:24px; }
+    }
+    @media (max-width:560px) {
+      .nav-links { gap:12px; } .nav-links a { font-size:14px; }
+      #drawCanvas { width:260px;height:240px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">AA</a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#creative-process">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="https://drive.google.com/file/d/YOUR_RESUME_FILE_ID/view?usp=sharing" target="_blank" rel="noopener" class="resume-link">Resume</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-text reveal" id="heroText">
+    <p class="hero-label">Anushka Agnihotri &nbsp;|&nbsp; Communication Design &nbsp;|&nbsp; UI/UX</p>
+    <h1 class="hero-heading">
+      I love to work around
+      <span class="blue-line">visuals that move people.</span>
+    </h1>
+    <p class="hero-para">
+      I love to work on designing products that <mark>grow with people</mark>. Always led by the reason 'why', I move from fieldwork to wireframes, from infographics to identities that <mark>build trust and accessibility</mark>.
+    </p>
+  </div>
+
+  <div class="hero-visual reveal" id="heroVisual">
+    <img src="Design_navigation_and_hero_section.svg" alt="Anushka illustration" loading="eager"
+      onerror="this.parentElement.outerHTML=document.getElementById('heroFbTpl').innerHTML" />
+  </div>
+</section>
+<template id="heroFbTpl">
+  <div class="hero-fallback reveal visible">
+    <svg viewBox="0 0 400 560" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <rect width="400" height="560" fill="#F5F1E8"/>
+      <rect x="205" y="55" width="58" height="58" fill="#FFE100" rx="4"/><rect x="268" y="55" width="58" height="58" fill="#FFE100" rx="4"/>
+      <rect x="331" y="55" width="58" height="58" fill="#FFE100" rx="4"/><rect x="205" y="118" width="58" height="58" fill="#FFE100" rx="4"/>
+      <rect x="268" y="118" width="58" height="58" fill="#FFE100" rx="4"/><rect x="331" y="118" width="58" height="58" fill="#FFE100" rx="4"/>
+      <rect x="205" y="181" width="58" height="58" fill="#FFE100" rx="4"/><rect x="268" y="181" width="58" height="58" fill="#FFE100" rx="4"/>
+      <ellipse cx="315" cy="108" rx="58" ry="42" fill="#5fad73"/>
+      <text x="315" y="118" font-family="Patrick Hand,cursive" font-size="30" fill="white" text-anchor="middle">hi!</text>
+      <circle cx="210" cy="188" r="52" fill="#e8d5b0"/>
+      <path d="M160 178 Q165 132 210 127 Q255 132 260 178 Q250 154 210 152 Q170 154 160 178Z" fill="#1a1a1a"/>
+      <rect x="188" y="186" width="17" height="13" rx="6.5" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+      <rect x="210" y="186" width="17" height="13" rx="6.5" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+      <line x1="205" y1="192" x2="210" y2="192" stroke="#1a1a1a" stroke-width="2"/>
+      <path d="M200 204 Q210 213 220 204" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="210" cy="178" r="3" fill="#e63946"/>
+      <path d="M150 405 Q170 272 210 267 Q250 272 270 405Z" fill="#5fad73"/>
+      <path d="M165 285 Q190 308 210 303 Q230 308 255 285" fill="white" opacity=".35"/>
+      <rect x="228" y="312" width="44" height="34" rx="6" fill="#1a1a1a"/>
+      <circle cx="250" cy="329" r="11" fill="#555"/><circle cx="250" cy="329" r="7" fill="#888"/>
+      <rect x="230" y="307" width="12" height="8" rx="2" fill="#333"/>
+      <path d="M160 315 Q140 340 145 390" stroke="#7F98B7" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M150 395 L135 510 L165 510 L210 425 L255 510 L285 510 L270 395Z" fill="#d4a843"/>
+      <ellipse cx="148" cy="512" rx="22" ry="10" fill="#4a9edd"/>
+      <ellipse cx="272" cy="512" rx="22" ry="10" fill="#4a9edd"/>
+    </svg>
+  </div>
+</template>
+
+<!-- DRAW -->
+<section id="draw-section">
+  <div class="draw-bg-fallback"></div>
+  <img class="draw-bg" src="another_2nd.svg" alt="" role="presentation" />
+  <div class="draw-content">
+    <h2>Every user is a person.<br>Draw one.</h2>
+    <p class="draw-sub">Sketch a face, any type of face. Release it into the world.</p>
+    <div class="canvas-wrapper">
+      <div class="canvas-stamp">
+        <canvas id="drawCanvas" width="380" height="340"></canvas>
+        <div class="draw-placeholder" id="drawPlaceholder">Start drawing here</div>
+      </div>
+    </div>
+    <div class="draw-buttons">
+      <button id="undoBtn">↩ Undo</button>
+      <button class="btn-next" id="nextBtn">Next →</button>
+      <button id="clearBtn">Clear</button>
+    </div>
+  </div>
+</section>
+
+<!-- USER GRID -->
+<section id="user-grid">
+  <p class="user-grid-intro reveal">
+    Every face is a different user. Every user is a different story. My job is to make sure the design speaks to all of them so none of those stories get left behind.
+  </p>
+  <div class="faces-grid-art reveal">
+    <img src="3rdc.svg" alt="Grid of illustrated faces" loading="lazy"
+      onerror="this.style.display='none';document.getElementById('fgFallback').style.display='grid'" />
+    <div class="faces-grid-fallback" id="fgFallback" style="display:none">
+      <div class="face-cell">🙂</div><div class="face-cell">😐</div><div class="face-cell">🧐</div>
+      <div class="face-cell">😑</div><div class="face-cell">🤔</div><div class="face-cell">😶</div>
+      <div class="face-cell">😏</div><div class="face-cell">🙁</div><div class="face-cell">😒</div>
+      <div class="face-cell">😟</div><div class="face-cell">😔</div><div class="face-cell">😕</div>
+      <div class="face-cell">😳</div><div class="face-cell">😬</div><div class="face-cell">🥱</div>
+      <div class="face-cell">😑</div><div class="face-cell">😐</div><div class="face-cell">🤨</div>
+      <div class="face-cell">😶</div><div class="face-cell">😑</div><div class="face-cell">😟</div>
+      <div class="face-cell">🙂</div><div class="face-cell">😮</div><div class="face-cell">😌</div>
+    </div>
+    <div class="user-drawing-overlay" id="userDrawingOverlay"></div>
+  </div>
+</section>
+
+<!-- CREATIVE PROCESS P1 -->
+<section id="creative-process">
+  <div class="cp-part1">
+    <h2 class="cp-title reveal">THE CREATIVE PROCESS</h2>
+    <div class="cp-road-art reveal">
+      <img src="4th.svg" alt="Road: Who What Why How AI" loading="lazy"
+        onerror="this.style.display='none';document.getElementById('roadFb').style.display='block'" />
+      <div id="roadFb" style="display:none" class="cp-road-fallback">
+        <div class="cp-ribbon"></div>
+        <div class="cp-steps">
+          <div class="cp-step"><span class="cp-step-word">Who</span><span class="cp-step-heart">♥</span></div>
+          <div class="cp-step"><span class="cp-step-word">What</span><span class="cp-step-heart">♥</span></div>
+          <div class="cp-step"><span class="cp-step-word">Why</span><span class="cp-step-heart">♥</span></div>
+          <div class="cp-step"><span class="cp-step-word">How</span><span class="cp-step-heart">♥</span></div>
+          <div class="cp-step"><span class="cp-step-word" style="color:var(--blue)">AI</span><span class="cp-step-heart" style="color:var(--blue)">♥</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="cp-road-desc reveal" style="transition-delay:.15s">
+      My process begins with people, understanding the <span class="hl-blue">'why'</span> before <span class="hl-blue">'how'</span>, and what's at stake. The design follows. I use AI to sharpen the work along the way.
+    </p>
+  </div>
+</section>
+
+<!-- CONTEXT SECTION -->
+<section id="context-section">
+  <div class="context-art reveal">
+    <img src="5th.svg" alt="Context vs Content" loading="lazy"
+      onerror="this.style.display='none';document.getElementById('ctxFb').style.display='grid'" />
+    <div id="ctxFb" style="display:none" class="context-fallback">
+      <div class="ctx-sketch">
+        <span class="ctx-tag">Process sketches</span>
+        <div style="border:2px solid #a0a0f0;border-radius:6px;padding:12px;margin-bottom:12px;font-size:13px;color:#555">
+          THIS TOO<br>SHALL PASS
+          <div style="margin-top:8px;background:#a0a0f0;color:#fff;border-radius:20px;display:inline-block;padding:3px 12px;font-size:11px">Component</div>
+        </div>
+        <div class="stickies">
+          <div class="sticky-n"></div><div class="sticky-n"></div><div class="sticky-n"></div>
+          <div class="sticky-n"></div><div class="sticky-n"></div><div class="sticky-n"></div>
+          <div class="sticky-n"></div><div class="sticky-n"></div>
+        </div>
+      </div>
+      <div class="ctx-center">
+        <p class="ctx-heading">I work with <span class="hl">context</span>,<br>not just <span class="hl">content</span>.</p>
+        <p class="ctx-body">In a world flooded with generated visuals, I believe the designer's real value is in the <span class="hli">thinking, the research, the narrative structure, the craft.</span> That's what Communication Design gave me, and that's what I bring.</p>
+      </div>
+      <div class="ctx-sketch">
+        <span class="ctx-tag">Wireframes</span>
+        <div class="wlines">
+          <div class="wl" style="width:90%"></div><div class="wl" style="width:70%"></div>
+          <div class="wl" style="width:80%"></div><div class="wl" style="width:60%"></div>
+          <div class="wl" style="width:85%"></div>
+        </div>
+        <div style="margin-top:16px;border:2px solid #1a1a1a;border-radius:8px;padding:12px;font-size:12px;color:#555;font-family:'Patrick Hand',cursive">
+          ⓪ A ─────→ B<br>
+          actions &nbsp;&nbsp;●●●●○○<br>
+          emotions ●●○○●●<br>
+          thinking &nbsp;●○●●○●
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-header reveal">
+    <h2>PROJECTS</h2>
+    <div class="underline-bar"></div>
+  </div>
+  <p class="projects-subtitle reveal">A look into what I've been working on :)</p>
+
+  <div class="folders-row">
+    <!-- Graphics -->
+    <div class="folder folder-graphics reveal">
+      <div class="folder-tab">Graphics</div>
+      <div class="folder-body" onclick="toggleFolder(this)"><div class="folder-label">Graphics</div></div>
+      <p class="folder-click-hint">click to open</p>
+      <div class="project-cards-container" id="cards-graphics">
+        <a href="https://www.behance.net/gallery/230738465/CRY-X-TCS-10K-Marathon-Summer-Internship" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>CRY × TCS 10K Marathon</h4>
+          <p>Contributed to the visual branding of the CRY–TCS 10K fundraising campaign in Bengaluru.</p>
+        </a>
+        <a href="https://www.behance.net/gallery/241159165/Terracotta-Bakery-Branding" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>Terracotta Bakery</h4>
+          <p>Rebranded a bakery in Rakkar, HP — story-driven identity inspired by European clay ovens and artisanal aesthetics.</p>
+        </a>
+        <a href="https://www.behance.net/gallery/230635819/NIFT-Prospectus-Design" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>NIFT Prospectus 2026</h4>
+          <p>Designed the NIFT 2026 prospectus — cohesive brand identity around craft and storytelling through typography and layout.</p>
+        </a>
+        <a href="https://www.behance.net/gallery/215518081/Tano-A-Childrens-Storybook" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>Tano — Children's Book</h4>
+          <p>Illustrated storybook teaching kids about SDG Zero Hunger through a folklore of the Juang tribe.</p>
+        </a>
+        <a href="https://www.behance.net/gallery/215541251/Jispa-Coffee-Table-Book" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>Jispa Coffee Table Book</h4>
+          <p>Coffee table book celebrating Jispa, Lahaul — the profound beauty that exists in simplicity.</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- UX -->
+    <div class="folder folder-ux reveal" style="transition-delay:.1s">
+      <div class="folder-tab">UX Design</div>
+      <div class="folder-body" onclick="toggleFolder(this)"><div class="folder-label">UX Design</div></div>
+      <p class="folder-click-hint">click to open</p>
+      <div class="project-cards-container" id="cards-ux">
+        <a href="https://www.behance.net/gallery/245827683/Poshan-Tracker-App-UX-Case-Study" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>Poshan Tracker | UX Audit</h4>
+          <p>UX research and redesign of the Facial Recognition System — a government nutrition app used by 1.4 million Anganwadi workers.</p>
+        </a>
+        <a href="https://www.behance.net/gallery/233511011/Lahual-Knitting-Craft-Research-Documentation" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>CRD | Usability Test</h4>
+          <p>Usability testing of the Lady of Keylong federation brand identity across feasibility, usability, and desirability.</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Extraaa -->
+    <div class="folder folder-extra reveal" style="transition-delay:.2s">
+      <div class="folder-tab">Extraaa</div>
+      <div class="folder-body" onclick="toggleFolder(this)"><div class="folder-label">Extraaa</div></div>
+      <p class="folder-click-hint">click to open</p>
+      <div class="project-cards-container" id="cards-extra">
+        <a href="https://www.behance.net/gallery/244660579/Trend-Forecasting-(2028-29)" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>Trend Forecasting 2028–29</h4>
+          <p>How changing mindsets post-2020 influence fashion — cultural research translated into garments, styling, and a studio shoot.</p>
+        </a>
+        <a href="https://www.behance.net/gallery/241145423/Chhaya-A-Short-Film-Documentary" target="_blank" rel="noopener noreferrer" class="project-card">
+          <h4>Documentary: Anganwadi</h4>
+          <p>Visual and spatial culture of Anganwadi centers in Kangra, HP — how space, hand-painted visuals, and play shape children's early experiences.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-visual reveal">
+    <img src="last.svg" alt="Illustration with bird holding Resume sign" loading="lazy"
+      onerror="this.style.display='none';document.getElementById('ctcFb').style.display='block'" />
+    <div id="ctcFb" style="display:none" class="contact-visual-fallback">
+      <span class="contact-bird-art">🐤</span>
+      <div class="contact-sign">RESUME</div>
+    </div>
+  </div>
+
+  <div class="contact-text reveal" style="transition-delay:.12s">
+    <h3>If the work makes sense</h3>
+    <h2>Let's talk.</h2>
+    <div class="contact-btns">
+      <a href="https://linkedin.com/in/anushka-agnihotri" target="_blank" rel="noopener" class="contact-btn">LinkedIn ↗</a>
+      <a href="https://www.behance.net/anushkaagnihotri" target="_blank" rel="noopener" class="contact-btn">Behance ↗</a>
+    </div>
+    <div class="contact-info">
+      <p>Gmail official: <a href="mailto:anushka.agnihotri@nift.ac.in">anushka.agnihotri@nift.ac.in</a></p>
+      <p>Gmail work: <a href="mailto:anushka9.lko@gmail.com">anushka9.lko@gmail.com</a></p>
+      <p>Phone: <a href="tel:+919580967510">+91 9580967510</a></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* CURSOR */
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => { cursor.style.left=e.clientX+'px'; cursor.style.top=e.clientY+'px'; });
+  document.querySelectorAll('a,button,[onclick],.folder-body').forEach(el => {
+    el.addEventListener('mouseenter',()=>cursor.classList.add('hovered'));
+    el.addEventListener('mouseleave',()=>cursor.classList.remove('hovered'));
+  });
+
+  /* NAV SCROLL */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll',()=>navbar.classList.toggle('scrolled',scrollY>40),{passive:true});
+
+  /* SCROLL REVEAL */
+  const revObs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('visible');revObs.unobserve(e.target);} });
+  },{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+  /* also reveal hero text on load */
+  window.addEventListener('load',()=>document.getElementById('heroText')?.classList.add('visible'));
+
+  /* DRAWING CANVAS */
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const ph = document.getElementById('drawPlaceholder');
+  let drawing=false, hasDrawn=false, strokes=[], cur=[];
+
+  function pos(e){
+    const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;
+    if(e.touches) return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+    return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+  }
+  function styleCtx(){ ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#ffffff'; }
+
+  canvas.addEventListener('mousedown',e=>{e.preventDefault();drawing=true;cur=[];const p=pos(e);cur.push(p);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+  canvas.addEventListener('mousemove',e=>{
+    if(!drawing)return;e.preventDefault();
+    if(!hasDrawn){hasDrawn=true;ph.style.display='none';}
+    const p=pos(e);cur.push(p);styleCtx();ctx.lineTo(p.x,p.y);ctx.stroke();
+  });
+  canvas.addEventListener('mouseup',e=>{if(!drawing)return;drawing=false;strokes.push([...cur]);cur=[];});
+  canvas.addEventListener('mouseleave',e=>{if(!drawing)return;drawing=false;strokes.push([...cur]);cur=[];});
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;cur=[];const p=pos(e);cur.push(p);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    if(!drawing)return;e.preventDefault();
+    if(!hasDrawn){hasDrawn=true;ph.style.display='none';}
+    const p=pos(e);cur.push(p);styleCtx();ctx.lineTo(p.x,p.y);ctx.stroke();
+  },{passive:false});
+  canvas.addEventListener('touchend',e=>{if(!drawing)return;drawing=false;strokes.push([...cur]);cur=[];});
+
+  function redraw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);styleCtx();
+    strokes.forEach(s=>{if(s.length<2)return;ctx.beginPath();ctx.moveTo(s[0].x,s[0].y);s.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));ctx.stroke();});
+  }
+
+  document.getElementById('undoBtn').addEventListener('click',()=>{
+    strokes.pop();
+    if(!strokes.length){hasDrawn=false;ph.style.display='flex';ctx.clearRect(0,0,canvas.width,canvas.height);}
+    else redraw();
+  });
+  document.getElementById('clearBtn').addEventListener('click',()=>{
+    strokes=[];hasDrawn=false;ph.style.display='flex';ctx.clearRect(0,0,canvas.width,canvas.height);
+  });
+  document.getElementById('nextBtn').addEventListener('click',()=>{
+    if(hasDrawn){
+      const ov=document.getElementById('userDrawingOverlay');
+      ov.innerHTML=`<img src="${canvas.toDataURL()}" alt="Your face"/>`;
+      ov.style.display='block';
+    }
+    document.getElementById('user-grid').scrollIntoView({behavior:'smooth'});
+  });
+
+  /* FOLDERS */
+  function toggleFolder(bodyEl){
+    const folder=bodyEl.closest('.folder');
+    const cards=folder.querySelector('.project-cards-container');
+    const hint=folder.querySelector('.folder-click-hint');
+    const open=cards.classList.toggle('open');
+    if(hint) hint.textContent=open?'click to close':'click to open';
+  }
+</script>
+</body>
+</html>
